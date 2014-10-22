@@ -1,0 +1,13 @@
+{
+    "name": "aainc/piolim",
+    "description": "easy benchmark tool",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Takeshi Ishida",
+            "email": "ishida@aainc.co.jp"
+        }
+    ],
+    "require": {}
+}
