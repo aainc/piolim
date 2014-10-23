@@ -10,7 +10,7 @@ class TimeThese {
      * calculate benchmark
      * @param $name string Test name
      * @param callable $closure benchmark target
-     * @param int $times benchmark times. default 0
+     * @param int $times benchmark times. default 100
      * @return \Piolim\Benchmark\TimeThese
      */
     public static function run ($name, \Closure $closure, $times = 100) {
@@ -18,10 +18,11 @@ class TimeThese {
         for ($i = 0; $i < $times; $i++) {
             $before = microtime(true);
             $result = $closure($i);
+            $after  = microtime(true);
             if ($result) {
                 print $result . "\n";
             }
-            $obj->add($i, $before, microtime(true));
+            $obj->add($i, $before, $after);
         }
         return $obj;
     }
@@ -50,7 +51,7 @@ class TimeThese {
      * clear log
      */
     private function clear () {
-        $this->logs[] = array();
+        $this->logs = array();
     }
 
     /**
@@ -82,15 +83,15 @@ class TimeThese {
     }
 
     /**
-     * get average time
+     * get average time(sec)
      * @return float average
      */
     public function getAverage () {
-        return ($this->getTotal() / count($this->logs));
+        return $this->getTotal() / count($this->logs);
     }
 
     /**
-     * get variance of times
+     * get variance of times(sec)
      * @return float variance
      */
     public function getVariance () {
@@ -109,6 +110,7 @@ class TimeThese {
     }
 
     /**
+     * get total time(sec)
      * @return number
      */
     public function getTotal () {
@@ -117,6 +119,7 @@ class TimeThese {
 
     /**
      * report
+     * @return string
      */
     public function toString ($details = false) {
         $average = $this->getAverage();
@@ -127,14 +130,14 @@ class TimeThese {
         $report .= "min:" . $this->getMin() . " ";
         $report .= "max:" . $this->getMax() . " ";
         $report .= "std:" . $std  . "\n";
-        if ($details)  {
+        if ($details) {
             $sorted = $this->logs;
             sort($sorted);
             $contents   = array();
             $contents[] = array('rank', 'time', 'division', 'number', 'distance');
             $distances = array();
             for ($i = 0; $i < count($sorted); $i++) {
-                $distance = floor(sqrt(pow(($sorted[$i]['time'] * 1000 - $average), 2) / $std) +
+                $distance = $std === 0 ? 0 : floor(sqrt(pow(($sorted[$i]['time'] * 1000 - $average), 2) / $std) +
                     (($sorted[$i]['time'] * 1000 - $average) % $std ? 1 : 0));
                 $contents[] = array(
                     $i + 1,
