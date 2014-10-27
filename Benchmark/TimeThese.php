@@ -137,7 +137,7 @@ class TimeThese {
             $contents[] = array('rank', 'time', 'division', 'number', 'distance');
             $distances = array();
             for ($i = 0; $i < count($sorted); $i++) {
-                $distance = $std === 0 ? 0 : floor(sqrt(pow(($sorted[$i]['time'] * 1000 - $average), 2) / $std) +
+                $distance = $std < 1  ? 0 : floor(sqrt(pow(($sorted[$i]['time'] * 1000 - $average), 2) / $std) +
                     (($sorted[$i]['time'] * 1000 - $average) % $std ? 1 : 0));
                 $contents[] = array(
                     $i + 1,
@@ -146,13 +146,13 @@ class TimeThese {
                     $sorted[$i]['times'],
                     $distance,
                 );
-                $distances[$distance]++;
+                $distance > 0 && $distances[$distance]++;
             }
             $length = array();
             foreach ($contents as $content) {
                 for ($i = 0; $i < count($content); $i++) {
-                    if ($length[$i] < strlen($content[$i])) {
-                        $length[$i]= strlen($content[$i]);
+                    if (!isset($length[$i]) || $length[$i] < strlen($content[$i])) {
+                        $length[$i] = strlen($content[$i]);
                     }
                 }
             }
