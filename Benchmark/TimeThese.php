@@ -42,9 +42,82 @@ class TimeThese {
      */
     public function add ($times, $before, $after) {
         $this->logs[] = array(
-            'time' => $after - $before,
+            'time' => ($after - $before) * 1000,
             'times' => $times
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function calcScores()
+    {
+        $std = $this->getStandardDeviation();
+        $average = $this->getAverage();
+        $sorted = $this->logs;
+        sort($sorted);
+        $contents = array();
+        for ($i = 0; $i < count($sorted); $i++) {
+            $distance = $std < 1 ? 0 : floor(sqrt(pow(($sorted[$i]['time'] - $average), 2) / $std) +
+            (($sorted[$i]['time'] - $average) % $std ? 1 : 0));
+            $contents[] = array(
+                $i + 1,
+                $sorted[$i]['time'],
+                $sorted[$i]['time'] - $average,
+                $sorted[$i]['times'],
+                $distance,
+            );
+        }
+        return $contents;
+    }
+
+    /**
+     * @return array
+     */
+    public function summaryDistances()
+    {
+        $contents = $this->calcScores();
+        $length = count($contents);
+        $distances = array();
+        for($i = 0; $i < $length; $i++) {
+           !isset($distances[$contents[$i][4]]) && $distances[$contents[$i][4]] = 0;
+           $distances[$contents[$i][4]]++;
+        }
+        sort($distances);
+        return $distances;
+    }
+
+    /**
+     * @return array
+     */
+    public function classifyDistance()
+    {
+        $maxKey = null;
+        foreach ($this->summaryDistances() as $key => $val) {
+            if ($maxKey == null || $maxKey < $key) $maxKey = $key;
+        }
+        $base = $maxKey / 2;
+        $classes = array();
+        foreach ($this->summaryDistances() as $key => $val) {
+            $rank = floor($key / $base);
+            if (!isset($classes[$rank])) $classes[$rank] = 0;
+            $classes[$rank] += $val;
+        }
+        $result = array();
+        $asc = ord('A');
+        $keys = array_keys($classes);
+        sort($keys);
+        foreach($keys as $key) {
+            $from = floor($key * $base);
+            $to   = (floor(($key + 1) * $base)) - 1;
+            if ($to > $maxKey) $to = $maxKey;
+            $result[chr($asc++)] = array(
+                'value' => $classes[$key],
+                'from' =>  $from,
+                'to'   =>  $to,
+            );
+        }
+        return $result;
     }
 
     /**
@@ -65,7 +138,7 @@ class TimeThese {
                 $max = $val['time'];
             }
         }
-        return $max * 1000;
+        return $max;
     }
 
     /**
@@ -79,7 +152,7 @@ class TimeThese {
                 $min = $val['time'];
             }
         }
-        return $min * 1000;
+        return $min;
     }
 
     /**
@@ -97,8 +170,8 @@ class TimeThese {
     public function getVariance () {
         $ave = $this->getAverage();
         return (float)(array_sum(array_map(function($val) use ($ave){
-            return pow($val['time'] - $ave / 1000, 2);
-        },$this->logs)) / count($this->logs)) * 1000;
+            return pow($val['time'] - $ave, 2);
+        }, $this->logs)) / count($this->logs));
     }
 
     /**
@@ -114,11 +187,12 @@ class TimeThese {
      * @return number
      */
     public function getTotal () {
-        return array_sum(array_map(function($val) {return $val['time'];}, $this->logs)) * 1000;
+        return array_sum(array_map(function($val) {return $val['time'];}, $this->logs));
     }
 
     /**
      * report
+     * @param bool $details
      * @return string
      */
     public function toString ($details = false) {
@@ -131,23 +205,8 @@ class TimeThese {
         $report .= "max:" . $this->getMax() . " ";
         $report .= "std:" . $std  . "\n";
         if ($details) {
-            $sorted = $this->logs;
-            sort($sorted);
-            $contents   = array();
-            $contents[] = array('rank', 'time', 'division', 'number', 'distance');
-            $distances = array();
-            for ($i = 0; $i < count($sorted); $i++) {
-                $distance = $std < 1  ? 0 : floor(sqrt(pow(($sorted[$i]['time'] * 1000 - $average), 2) / $std) +
-                    (($sorted[$i]['time'] * 1000 - $average) % $std ? 1 : 0));
-                $contents[] = array(
-                    $i + 1,
-                    $sorted[$i]['time'] * 1000,
-                    ($sorted[$i]['time'] * 1001 - $average),
-                    $sorted[$i]['times'],
-                    $distance,
-                );
-                $distance > 0 && $distances[$distance]++;
-            }
+            $contents = $this->calcScores();
+            array_unshift($contents,array('rank', 'time', 'division', 'number', 'distance'));
             $length = array();
             foreach ($contents as $content) {
                 for ($i = 0; $i < count($content); $i++) {
@@ -169,9 +228,8 @@ class TimeThese {
                 $row++;
             }
             $report .= "<<distances>>\n";
-            foreach ($distances as $key => $val) {
-                if (!$val) continue;
-                $report .= "$key = $val\n";
+            foreach($this->classifyDistance() as $key => $struct){
+                $report .= "$key:" . $struct['value'] . '(' . $struct['from'] . ',' . $struct['to'] . ')' . "\n";
             }
         }
         return $report;
