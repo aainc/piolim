@@ -83,7 +83,6 @@ class TimeThese {
            !isset($distances[$contents[$i][4]]) && $distances[$contents[$i][4]] = 0;
            $distances[$contents[$i][4]]++;
         }
-        sort($distances);
         return $distances;
     }
 
@@ -93,9 +92,11 @@ class TimeThese {
     public function classifyDistance()
     {
         $maxKey = null;
+        if (!$this->summaryDistances()) return array();
         foreach ($this->summaryDistances() as $key => $val) {
             if ($maxKey == null || $maxKey < $key) $maxKey = $key;
         }
+        if ($maxKey) return array();
         $base = $maxKey / 2;
         $classes = array();
         foreach ($this->summaryDistances() as $key => $val) {
