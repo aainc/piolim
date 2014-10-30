@@ -5,7 +5,7 @@ use PHPUnit_Framework_AssertionFailedError;
 use PHPUnit_Framework_Test;
 use PHPUnit_Framework_TestSuite;
 
-class TimeTheseTester implements \PHPUnit_Framework_TestListener
+class TimeTheseListener implements \PHPUnit_Framework_TestListener
 {
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
@@ -13,12 +13,16 @@ class TimeTheseTester implements \PHPUnit_Framework_TestListener
         if (class_exists($suite->getName())) {
             $clazz = new \ReflectionClass($testCase);
             if ($clazz->isSubclassOf('PHPUnit_Framework_TestCase')) {
+                $testCase = $clazz->newInstance();
+                if (method_exists($testCase, 'setup')) {
+                    $testCase->setup();
+                }
                 foreach ($clazz->getMethods() as $method) {
                     $annotations = \Piolim\Annotations::analyze($method->getDocComment());
                     if (!$annotations->exists('Bench')) continue;
                     $annotation = $annotations->getByName('Bench');
-                    $suite->addTest(new TimeTheseTest(function($i) use($method, $suite) {
-                        $method->invoke($suite);
+                    $suite->addTest(new TimeTheseTest(function($i) use($method, $testCase) {
+                        $method->invoke($testCase);
                     },$annotation));
                 }
             }

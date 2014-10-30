@@ -1,6 +1,6 @@
 <?php
 namespace Piolim\Benchmark\phpunit;
-class TimeTheseTesterTest extends \PHPUnit_Framework_TestCase
+class TimeTheseListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var TimeTheseTester
@@ -9,12 +9,12 @@ class TimeTheseTesterTest extends \PHPUnit_Framework_TestCase
     private $suite = null;
 
     public function setUp () {
-        $this->target = new TimeTheseTester();
+        $this->target = new TimeTheseListener();
         $this->suite = \Phake::mock('\PHPUnit_Framework_TestSuite');
     }
 
     public function testStartTestSuite () {
-        \Phake::when($this->suite)->getName()->thenReturn('Piolim\Benchmark\phpunit\TimeTheseTesterTest');
+        \Phake::when($this->suite)->getName()->thenReturn('Piolim\Benchmark\phpunit\TimeTheseListenerTest');
         $this->target->startTestSuite($this->suite);
         \Phake::verify($this->suite)->addTest($this->isInstanceOf('\Piolim\Benchmark\phpunit\TimeTheseTest'));
     }
