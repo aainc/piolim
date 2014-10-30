@@ -59,7 +59,7 @@ class TimeThese {
         $contents = array();
         for ($i = 0; $i < count($sorted); $i++) {
             $distance = $std < 1 ? 0 : floor(sqrt(pow(($sorted[$i]['time'] - $average), 2) / $std) +
-            (($sorted[$i]['time'] - $average) % $std ? 1 : 0));
+                (($sorted[$i]['time'] - $average) % $std ? 1 : 0));
             $contents[] = array(
                 $i + 1,
                 $sorted[$i]['time'],
@@ -96,7 +96,7 @@ class TimeThese {
         foreach ($this->summaryDistances() as $key => $val) {
             if ($maxKey == null || $maxKey < $key) $maxKey = $key;
         }
-        if ($maxKey) return array();
+        if (!$maxKey) return array();
         $base = $maxKey / 2;
         $classes = array();
         foreach ($this->summaryDistances() as $key => $val) {
@@ -200,11 +200,21 @@ class TimeThese {
         $average = $this->getAverage();
         $std = $this->getStandardDeviation();
         $report  = "<< $this->name >>\n";
+        $report .= "[abstract]\n";
         $report .= "total:" . $this->getTotal() . " ";
         $report .= "average:" . $average . " ";
         $report .= "min:" . $this->getMin() . " ";
         $report .= "max:" . $this->getMax() . " ";
         $report .= "std:" . $std  . "\n";
+        $report .= "\n";
+        $report .= "[distances]\n";
+        foreach ($this->classifyDistance() as $key => $struct){
+            $report .= "$key:" . $struct['value'] . '(' . $struct['from'] . ',' . $struct['to'] . ')' . "\n";
+        }
+        $report .= "\n";
+        foreach ($this->summaryDistances() as $key => $val){
+            $report .= "$key = $val\n";
+        }
         if ($details) {
             $contents = $this->calcScores();
             array_unshift($contents,array('rank', 'time', 'division', 'number', 'distance'));
@@ -227,10 +237,6 @@ class TimeThese {
                 }
                 $report .= "\n";
                 $row++;
-            }
-            $report .= "<<distances>>\n";
-            foreach($this->classifyDistance() as $key => $struct){
-                $report .= "$key:" . $struct['value'] . '(' . $struct['from'] . ',' . $struct['to'] . ')' . "\n";
             }
         }
         return $report;
