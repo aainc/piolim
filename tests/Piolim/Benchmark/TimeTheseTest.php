@@ -55,4 +55,14 @@ class TimeTheseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0,$contents[1][4]);
         $this->assertEquals(35,$contents[2][4]);
     }
+
+    public function testClosure () {
+        $url = 'http://yahoo.co.jp';
+        print TimeThese::run('hoge', function () use ($url) {
+            $result = file_get_contents($url);
+            return function () use ($result){
+                return (preg_match('#<html>#', $result) ? 'OK' : 'NG') . "\n";
+            };
+        }, 5);
+    }
 }

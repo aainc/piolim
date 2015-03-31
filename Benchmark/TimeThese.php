@@ -19,7 +19,9 @@ class TimeThese {
             $before = microtime(true);
             $result = $closure($i);
             $after  = microtime(true);
-            if ($result) {
+            if ($result instanceof \Closure) {
+                print $result();
+            } else {
                 print $result . "\n";
             }
             $obj->add($i, $before, $after);

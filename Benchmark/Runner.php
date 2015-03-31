@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
-$options = getopt('c:n::h::t::m::');
-if (!isset($options['c']) || isset($options['h'])) {?>
+$options = getopt('c:n::h::t::m::u::');
+if ((!isset($options['c']) && !isset($options['u'])) || isset($options['h'])) {?>
 Usage:
   not yet
 <?php
@@ -18,7 +18,20 @@ spl_autoload_register(function($className) use ($nameSpaces){
         }
     }
 });
-$code  = $options['c'];
+
+$runner = null;
+if (isset($options['u'])) {
+    $url = $options['u'];
+    $runner = function($i) use($url) {
+        file_get_contents($url);
+    };
+} else {
+    $code  = $options['c'];
+    $runner = function($i) use($code) {
+        return eval($code);
+    };
+}
+
 $name  = isset($options['n']) ? $options['n'] : date('YmdHis');
 $times = isset($options['t']) ? $options['t'] : 100;
 if (isset($options['m'])) {
@@ -29,5 +42,5 @@ if (isset($options['m'])) {
         }
     }
 }
-echo Piolim\Benchmark\TimeThese::run($name, function($i) use ($code) {eval($code);}, $times);
+echo Piolim\Benchmark\TimeThese::run($name, $runner, $times);
 
