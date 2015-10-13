@@ -22,8 +22,12 @@ spl_autoload_register(function($className) use ($nameSpaces){
 $runner = null;
 if (isset($options['u'])) {
     $url = $options['u'];
-    $runner = function($i) use($url) {
-        file_get_contents($url);
+    $obj = curl_init($url);
+    curl_setopt($obj, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($obj, CURLOPT_SSL_VERIFYPEER, false); // 証明書の検証を行わない
+    curl_setopt($obj, CURLOPT_RETURNTRANSFER, true);  // curl_execの結果を文字列で返す
+    $runner = function($i) use($obj) {
+        curl_exec($obj);
     };
 } else {
     $code  = $options['c'];

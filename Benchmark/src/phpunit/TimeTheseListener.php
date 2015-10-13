@@ -18,7 +18,7 @@ class TimeTheseListener implements \PHPUnit_Framework_TestListener
                     $testCase->setup();
                 }
                 foreach ($clazz->getMethods() as $method) {
-                    $annotations = \Piolim\Annotations::analyze($method->getDocComment());
+                    $annotations = \Piolim\Benchmark\Annotations::analyze($method->getDocComment());
                     if (!$annotations->exists('Bench')) continue;
                     $annotation = $annotations->getByName('Bench');
                     $suite->addTest(new TimeTheseTest(function($i) use($method, $testCase) {
@@ -56,5 +56,19 @@ class TimeTheseListener implements \PHPUnit_Framework_TestListener
 
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
+    }
+
+    /**
+     * Risky test.
+     *
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     *
+     * @since  Method available since Release 4.0.0
+     */
+    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    {
+        // TODO: Implement addRiskyTest() method.
     }
 }

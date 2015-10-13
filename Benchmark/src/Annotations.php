@@ -1,5 +1,5 @@
 <?php
-namespace Piolim;
+namespace Piolim\Benchmark;
 class Annotations implements \ArrayAccess {
     /**
      * @param $comment

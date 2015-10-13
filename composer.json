@@ -9,5 +9,18 @@
             "email": "ishida@aainc.co.jp"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phake/phake": "2.*",
+        "PHPUnit/phpunit": "*",
+        "phpdocumentor/phpdocumentor" : "*",
+        "sebastian/phpcpd" : "*",
+        "phpmd/phpmd" : "*",
+        "squizlabs/php_codesniffer": "2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Piolim\\Cache\\": "Cache/src",
+            "Piolim\\Benchmark\\": "Benchmark/src"
+        }
+    }
 }

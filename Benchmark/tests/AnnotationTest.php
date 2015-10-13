@@ -1,5 +1,5 @@
 <?php
-namespace Piolim;
+namespace Piolim\Benchmark;
 
 class AnnotationTest extends \PHPUnit_Framework_TestCase
 {

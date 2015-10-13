@@ -11,7 +11,7 @@ class TimeTheseTestTest extends \PHPUnit_Framework_TestCase
     private $result = null;
 
     public function setUp () {
-        $this->annotation = \Phake::mock('\Piolim\Annotation');
+        $this->annotation = \Phake::mock('\Piolim\Benchmark\Annotation');
         $this->target = new TimeTheseTest(function($i){
             sleep(1);
         }, $this->annotation);

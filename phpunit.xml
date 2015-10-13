@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-        bootstrap="./tests/bootstrap.php"
+        bootstrap="./bootstrap.php"
         colors="true"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
@@ -12,7 +12,8 @@
         syntaxCheck="true"
         >
     <testsuite name="Piolim tests">
-        <directory>./tests/Piolim</directory>
+        <directory>./Cache/tests</directory>
+        <directory>./Benchmark/tests</directory>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">

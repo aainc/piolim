@@ -1,6 +1,6 @@
 <?php
 namespace Piolim\Benchmark\phpunit;
-use Piolim\Annotation;
+use Piolim\Benchmark\Annotation;
 use Piolim\Benchmark\TimeThese;
 
 class TimeTheseTest implements \PHPUnit_Framework_Test

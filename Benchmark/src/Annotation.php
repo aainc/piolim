@@ -1,5 +1,5 @@
 <?php
-namespace Piolim;
+namespace Piolim\Benchmark;
 class Annotation implements \ArrayAccess {
     private $name = null;
     private $properties = null;
